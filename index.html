@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestor de Tareas Contables</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>📊 Gestor de Tareas Contables</h1>
+                <p class="subtitle">Sistema de gestión para despachos contables</p>
+            </div>
+        </header>
+
+        <!-- Dashboard -->
+        <section class="dashboard">
+            <div class="stat-card">
+                <div class="stat-number" id="totalTasks">0</div>
+                <div class="stat-label">Total de Tareas</div>
+            </div>
+            <div class="stat-card pending">
+                <div class="stat-number" id="pendingTasks">0</div>
+                <div class="stat-label">Pendientes</div>
+            </div>
+            <div class="stat-card in-progress">
+                <div class="stat-number" id="inProgressTasks">0</div>
+                <div class="stat-label">En Proceso</div>
+            </div>
+            <div class="stat-card completed">
+                <div class="stat-number" id="completedTasks">0</div>
+                <div class="stat-label">Completadas</div>
+            </div>
+        </section>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Form Section -->
+            <section class="form-section">
+                <h2>Agregar Nueva Tarea</h2>
+                <form id="taskForm" class="task-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="taskName">Nombre/Descripción *</label>
+                            <input type="text" id="taskName" required placeholder="Ej: Declaración de impuestos - Enero">
+                        </div>
+                        <div class="form-group">
+                            <label for="client">Cliente/Empresa *</label>
+                            <input type="text" id="client" required placeholder="Ej: ABC Corp S.A.">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="category">Categoría *</label>
+                            <select id="category" required>
+                                <option value="">-- Seleccionar --</option>
+                                <option value="Impuestos">Impuestos</option>
+                                <option value="Facturación">Facturación</option>
+                                <option value="Conciliación bancaria">Conciliación bancaria</option>
+                                <option value="Nómina">Nómina</option>
+                                <option value="Cierre contable">Cierre contable</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="dueDate">Fecha de Vencimiento *</label>
+                            <input type="date" id="dueDate" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="priority">Prioridad *</label>
+                            <select id="priority" required>
+                                <option value="Media">Media</option>
+                                <option value="Alta">Alta</option>
+                                <option value="Baja">Baja</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="status">Estado *</label>
+                            <select id="status" required>
+                                <option value="Pendiente">Pendiente</option>
+                                <option value="En proceso">En proceso</option>
+                                <option value="Completado">Completado</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="responsible">Responsable *</label>
+                            <input type="text" id="responsible" required placeholder="Nombre del contador o responsable">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Agregar Tarea</button>
+                </form>
+            </section>
+
+            <!-- Filters Section -->
+            <section class="filters-section">
+                <h2>Filtrar y Ordenar</h2>
+                <div class="filters">
+                    <div class="filter-group">
+                        <label for="filterState">Estado:</label>
+                        <select id="filterState">
+                            <option value="">Todos</option>
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="En proceso">En proceso</option>
+                            <option value="Completado">Completado</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterCategory">Categoría:</label>
+                        <select id="filterCategory">
+                            <option value="">Todas</option>
+                            <option value="Impuestos">Impuestos</option>
+                            <option value="Facturación">Facturación</option>
+                            <option value="Conciliación bancaria">Conciliación bancaria</option>
+                            <option value="Nómina">Nómina</option>
+                            <option value="Cierre contable">Cierre contable</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterPriority">Prioridad:</label>
+                        <select id="filterPriority">
+                            <option value="">Todas</option>
+                            <option value="Alta">Alta</option>
+                            <option value="Media">Media</option>
+                            <option value="Baja">Baja</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label for="filterClient">Cliente:</label>
+                        <input type="text" id="filterClient" placeholder="Buscar cliente...">
+                    </div>
+                    <button id="clearFilters" class="btn btn-secondary">Limpiar Filtros</button>
+                </div>
+            </section>
+
+            <!-- Tasks Table Section -->
+            <section class="table-section">
+                <div class="table-header">
+                    <h2>Lista de Tareas</h2>
+                    <button id="downloadReport" class="btn btn-success">📥 Descargar Excel</button>
+                </div>
+
+                <div class="table-wrapper">
+                    <table id="tasksTable" class="tasks-table">
+                        <thead>
+                            <tr>
+                                <th class="col-checkbox">✓</th>
+                                <th class="col-name">Nombre</th>
+                                <th class="col-client">Cliente</th>
+                                <th class="col-category">Categoría</th>
+                                <th class="col-date">Vencimiento</th>
+                                <th class="col-priority">Prioridad</th>
+                                <th class="col-status">Estado</th>
+                                <th class="col-responsible">Responsable</th>
+                                <th class="col-actions">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tasksBody">
+                        </tbody>
+                    </table>
+                    <div id="noTasks" class="no-tasks">
+                        <p>No hay tareas registradas. Agrega una nueva tarea para comenzar.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Modal para editar tarea -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Editar Tarea</h2>
+            <form id="editForm" class="task-form">
+                <input type="hidden" id="editTaskId">
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editTaskName">Nombre/Descripción *</label>
+                        <input type="text" id="editTaskName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="editClient">Cliente/Empresa *</label>
+                        <input type="text" id="editClient" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editCategory">Categoría *</label>
+                        <select id="editCategory" required>
+                            <option value="Impuestos">Impuestos</option>
+                            <option value="Facturación">Facturación</option>
+                            <option value="Conciliación bancaria">Conciliación bancaria</option>
+                            <option value="Nómina">Nómina</option>
+                            <option value="Cierre contable">Cierre contable</option>
+                            <option value="Otro">Otro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editDueDate">Fecha de Vencimiento *</label>
+                        <input type="date" id="editDueDate" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="editPriority">Prioridad *</label>
+                        <select id="editPriority" required>
+                            <option value="Alta">Alta</option>
+                            <option value="Media">Media</option>
+                            <option value="Baja">Baja</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editStatus">Estado *</label>
+                        <select id="editStatus" required>
+                            <option value="Pendiente">Pendiente</option>
+                            <option value="En proceso">En proceso</option>
+                            <option value="Completado">Completado</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label for="editResponsible">Responsable *</label>
+                        <input type="text" id="editResponsible" required>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                    <button type="button" id="cancelEdit" class="btn btn-secondary">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
